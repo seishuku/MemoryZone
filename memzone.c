@@ -7,6 +7,7 @@
 #include "system.h"
 #include "memzone.h"
 
+static const size_t CHUNK_SIZE=8;
 static const size_t HEADER_SIZE=sizeof(MemBlock_t);
 
 MemZone_t *Zone_Init(size_t Size)
@@ -115,8 +116,8 @@ void Zone_Free(MemZone_t *Zone, void *Ptr)
 
 static MemBlock_t *createBlock(void *Base, size_t Offset, size_t Size, bool Free, MemBlock_t *Previous, MemBlock_t *Next)
 {
-	// Address for the new block is the base address + header + offset.
-	MemBlock_t *newBlock=(MemBlock_t *)((uint8_t *)Base+sizeof(MemBlock_t)+Offset);
+	// Address for the new block is the base address + offset.
+	MemBlock_t *newBlock=(MemBlock_t *)((uint8_t *)Base+Offset);
 
 	// New size is the current free block size minus the requested size.
 	newBlock->Size=Size;
@@ -129,9 +130,9 @@ static MemBlock_t *createBlock(void *Base, size_t Offset, size_t Size, bool Free
 
 void *Zone_Malloc(MemZone_t *Zone, size_t Size)
 {
-	const size_t MinimumBlockSize=HEADER_SIZE;
+	const size_t MinimumBlockSize=64;
 
-	Size+=HEADER_SIZE;
+	Size+=(HEADER_SIZE+CHUNK_SIZE-1)&~(CHUNK_SIZE-1);	// Align to chunk boundary
 
 	MemBlock_t *Base=Zone->Current;
 
