@@ -26,5 +26,8 @@
     <ClInclude Include="memzone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
